@@ -1,0 +1,66 @@
+version: 2
+sources:
+  - name: dbt_demo_two
+    tables:
+      - name: raw_table1
+        description: "Mapping to File1"
+                            
+        external:
+          location: gs://dbt_demo_two/File1.csv
+          options:
+            format: csv
+            skip_leading_rows: 1
+          
+        
+        # Specify ALL column names + datatypes.
+        # Column order must match for CSVs, column names must match for other formats.
+        # Some databases support schema inference.
+        columns:
+          - name: ID
+            data_type: INTEGER
+            description: "Party ID"
+            tests:
+              - unique
+              - not_null
+              - relationships:
+                  to: source('dbt_demo_two', 'raw_table2')
+                  field: ID
+          - name: Amount
+            data_type: INTEGER
+            description: "Value of Amount"
+          - name: Ind_Latest
+            data_type: INTEGER
+            description: "Latest value of Indicator"
+      
+      - name: raw_table2
+        description: "Mapping to File2"
+                            
+        external:
+          location: gs://dbt_demo_two/File2.csv
+          options:
+            format: csv
+            skip_leading_rows: 1
+          
+        
+        # Specify ALL column names + datatypes.
+        # Column order must match for CSVs, column names must match for other formats.
+        # Some databases support schema inference.
+        columns:
+          - name: ID
+            data_type: INTEGER
+            description: "Party ID"
+            tests:
+              - unique
+              - not_null
+              - relationships:
+                  to: source('dbt_demo_two', 'raw_table1')
+                  field: ID
+          - name: Ind_M1
+            data_type: INTEGER
+            description: "Month - 1 Indicator"
+          - name: Ind_M2
+            data_type: INTEGER
+            description: "Month - 2 Indicator"
+          - name: Ind_M3
+            data_type: INTEGER
+            description: "Month - 3 Indicator"
